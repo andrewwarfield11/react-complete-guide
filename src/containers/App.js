@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import Radium, {StyleRoot} from 'radium'
+import Radium from 'radium'
 import './App.css';
-import Person from './Person/Person';
+import Persons from '../components/Persons/Persons.js'
+import Cockpit from '../components/Cockpit/Cockpit'
+
+// convert the css here and in cockpit to css modules (I think that's what he uses in the actual tutorial?)
+// it should be good once that's done; all errors are caused by differences between css management libraries
 
 class App extends Component {
   state = {
@@ -46,60 +50,27 @@ class App extends Component {
   }
 
   render () {
-    const style = {
-      backgroundColor: 'green',
-      color: 'white',
-      font: 'inherit',
-      border: '1px solid blue',
-      padding: '8px',
-      cursor: 'pointer',
-      ':hover': {
-        backgroundColor: 'lightgreen',
-        color: 'black'
-      }
-    };
 
     let persons = null;
 
     if ( this.state.showPersons ) {
       persons = (
         <div>
-          {this.state.persons.map((person, index) => {
-            return <Person
-              click={() => this.deletePersonHandler(index)}
-              name={person.name} 
-              age={person.age}
-              key={person.id}
-              changed={(event) => this.nameChangedHandler(event, person.id)} />
-          })}
+          <Persons
+            persons={this.state.persons}
+            clicked={this.deletePersonHandler}
+            changed={this.nameChangedHandler}></Persons>
         </div>
       );
-      style.backgroundColor = 'red';
-      style[':hover'] = {
-        backgroundColor: 'salmon',
-        color: 'black'
       }
-    }
-
-    let classes = [];
-    if(this.state.persons.length <= 2) {
-      classes.push('red');
-    }
-    if(this.state.persons.length <= 1) {
-      classes.push('bold')
-    }
 
     return (
-      <StyleRoot>
-        <div className="App">
-          <h1>Hi, I'm a React App</h1>
-          <p className={classes.join(' ')}>This is really working!</p>
-          <button
-            style={style}
-            onClick={this.togglePersonsHandler}>Toggle Persons</button>
-          {persons}
-        </div>
-      </StyleRoot>
+      <div className="App">
+        <Cockpit showPersons={this.state.showPersons}
+        persons={this.state.persons} 
+        clicked={this.togglePersonsHandler}/>
+        {persons}
+      </div>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
   }
