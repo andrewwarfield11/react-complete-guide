@@ -4,9 +4,6 @@ import './App.css';
 import Persons from '../components/Persons/Persons.js'
 import Cockpit from '../components/Cockpit/Cockpit'
 
-// convert the css here and in cockpit to css modules (I think that's what he uses in the actual tutorial?)
-// it should be good once that's done; all errors are caused by differences between css management libraries
-
 class App extends Component {
   state = {
     persons: [
@@ -55,12 +52,10 @@ class App extends Component {
 
     if ( this.state.showPersons ) {
       persons = (
-        <div>
           <Persons
             persons={this.state.persons}
             clicked={this.deletePersonHandler}
             changed={this.nameChangedHandler}></Persons>
-        </div>
       );
       }
 
