@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import Radium from 'radium'
-import './App.css';
+//import './App.css';
 import Persons from '../components/Persons/Persons.js'
 import Cockpit from '../components/Cockpit/Cockpit'
+import withClass from '../hoc/withClass.js'
+import classes from './App.module.css'
+import Aux from '../hoc/Aux.js'
+import AuthContext from '../context/auth-context.js'
 
 class App extends Component {
   constructor(props) {
@@ -15,7 +18,10 @@ class App extends Component {
         { id: 'lkfds9', name: 'Max', age: 29 }
       ],
       otherState: 'some other value',
-      showPersons: false
+      showPersons: false,
+      showCockpit: true,
+      changeCounter: 0,
+      authenticated: false
     }
   }
 
@@ -27,6 +33,18 @@ class App extends Component {
 
   componentDidMount() {
     console.log('App.js componendidmount');
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('App.js shouldComponentUpdate');
+    return true;
+  }
+  componentDidUpdate() {
+    console.log('App.js componentDidUpdate');
+  }
+
+  loginHandler = () => {
+    this.setState({authenticated: true});
   }
 
   nameChangedHandler = ( event, id ) => {
@@ -45,7 +63,12 @@ class App extends Component {
     const persons = [...this.state.persons];
     persons[personIndex] = person;
 
-    this.setState( {persons: persons} );
+    this.setState( (prevState,props) => {
+      return {
+        persons: person,
+        changeCounter: prevState.changeCounter + 1
+      };
+    } );
   }
 
   deletePersonHandler = (personIndex) => {
@@ -70,21 +93,32 @@ class App extends Component {
           <Persons
             persons={this.state.persons}
             clicked={this.deletePersonHandler}
-            changed={this.nameChangedHandler}></Persons>
+            changed={this.nameChangedHandler}
+            isAuthenticated={this.state.authenticated}></Persons>
       );
       }
 
     return (
-      <div className="App">
-        <Cockpit showPersons={this.state.showPersons}
-        title={this.props.appTitle}
-        persons={this.state.persons} 
-        clicked={this.togglePersonsHandler}/>
-        {persons}
-      </div>
+      <Aux>
+        <button 
+          onClick={() => {
+            this.setState({showCockpit: !this.state.showCockpit});
+          }}>Remove Cockpit</button>
+          <AuthContext.Provider value={{authenticated: this.state.authenticated, login: this.loginHandler}}>
+            {this.state.showCockpit ? 
+            <Cockpit 
+              showPersons={this.state.showPersons}
+              personsLength={this.state.persons.length}
+              title={this.props.appTitle}
+              persons={this.state.persons} 
+              clicked={this.togglePersonsHandler}
+              login={this.loginHandler}/> : null }
+          {persons}
+          </AuthContext.Provider>
+      </Aux> 
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
   }
 }
 
-export default Radium(App);
+export default withClass(App,classes.App);
